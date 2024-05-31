@@ -19,11 +19,9 @@ const getCurrentTicket = async () => {
     console.log(result);
     currentTicket.value = result[0];
 }
-const getNextTicket = async (id: number) => {
-    if (!finished.value) {
-        return alert('У вас еще обслуживает билет')
-    }
-    await callNextTicket(id);
+const getNextTicket = async () => {
+
+    await callNextTicket();
     await getSessionTickets();
     await getCurrentTicket();
     finished.value = false;
@@ -44,8 +42,7 @@ onMounted(() => {
     getCurrentTicket();
     setInterval(() => {
         getSessionTickets();
-        getCurrentTicket();
-    }, 2000)
+    }, 3000)
 })
 
 
@@ -72,7 +69,7 @@ onMounted(() => {
                 </div>
                 <div class="buttons">
                     <button @click="finish(currentTicket.id)" type="button" class="btn btn-primary">Завершить</button>
-                    <button @click="getNextTicket(session_id)" type="button" class="btn btn-primary">Следующий</button>
+                    <button @click="getNextTicket()" type="button" class="btn btn-primary">Следующий</button>
                 </div>
             </div>
 
