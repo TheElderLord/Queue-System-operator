@@ -1,12 +1,20 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+
+import { onMounted, ref, watch } from "vue";
 import type { Ticket } from "../models/ticket.interface"
-import { fetchTickets, fetchCurrentTicket, callNextTicket, ticketFinishPost } from "../utils/tickets.utils"
+import { fetchTickets, fetchCurrentTicket, callNextTicket, ticketFinishPost, startSession, stopSessionRequest } from "../utils/tickets.utils"
+
+const active = ref(false);
 
 const tickets = ref([] as Ticket[]);
-const currentTicket = ref({} as Ticket | null);
+const currentTicket = ref({} as Ticket);
 
-const session_id = 1;
+// 15 minutes in milliseconds
+const countdown = ref(15 * 60 * 1000); // 15 minutes in milliseconds
+const elapsedTime = ref(0); // Time elapsed after reaching 15 minutes
+const interval = ref(null as any);// Time elapsed after reaching 15 minutes
+
+
 
 const finished = ref(false);
 
@@ -17,32 +25,81 @@ const getSessionTickets = async () => {
 const getCurrentTicket = async () => {
     const result = await fetchCurrentTicket()
     console.log(result);
+    if (result.length === 0) {
+        finished.value = true;
+    }
     currentTicket.value = result[0];
 }
 const getNextTicket = async () => {
-
+    if (!finished.value) {
+        return alert("Обслуживание не окончено")
+    }
     await callNextTicket();
     await getSessionTickets();
     await getCurrentTicket();
+    resetTimer();
     finished.value = false;
 }
 const finish = async (id: number) => {
     await ticketFinishPost(id);
-    currentTicket.value = null;
+    // currentTicket.value = null;
     finished.value = true;
+}
+const startASession = async () => {
+    active.value = true;
+    localStorage.setItem("sessionStatus", "ONNLINE")
+    const data = await startSession();
 }
 
 const formatDate = (date: Date) => {
     return new Date(date).toLocaleString("ru-RU")
 }
 
+const formatTime = (time: number) => {
+    const minutes = Math.floor(time / (1000 * 60));
+    const seconds = Math.floor((time % (1000 * 60)) / 1000);
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+const stopSession = async () => {
+    await stopSessionRequest();
+    localStorage.setItem("sessionStatus", "OFFLINE")
+}
+
+const startTimer = () => {
+    interval.value = setInterval(() => {
+        if (countdown.value > 0) {
+            countdown.value -= 1000;
+        } else {
+            elapsedTime.value += 1000;
+        }
+    }, 1000);
+};
+
+const resetTimer = () => {
+    clearInterval(interval.value);
+    countdown.value = 15 * 60 * 1000; // reset to 15 minutes
+    elapsedTime.value = 0; // reset elapsed time
+    startTimer();
+};
+
+
+watch(active, () => {
+    if (active.value) {
+        getCurrentTicket();
+        getSessionTickets();
+        startTimer()
+        setInterval(() => {
+            getSessionTickets();
+        }, 3000)
+    }
+});
 
 onMounted(() => {
-    getSessionTickets();
-    getCurrentTicket();
-    setInterval(() => {
-        getSessionTickets();
-    }, 3000)
+    localStorage.getItem("sessionStatus") === "ONNLINE" ? active.value = true : active.value = false
+
+    // setInterval(() => {
+    //     getSessionTickets();
+    // }, 3000)
 })
 
 
@@ -50,30 +107,47 @@ onMounted(() => {
 <template>
     <main>
         <div class="main-tab">
-            <div class="info">
-                <div v-if="currentTicket" class="info-container">
-                    <div class="number">
-                        {{ currentTicket.ticketNumber }}
-                    </div>
-                    <div class="rest">
-                        <div class="serviceName">
-                            {{ currentTicket.serviceName }}
-                        </div>
-                        <div class="register">
-                            {{ formatDate(currentTicket.registrationTime) }}
-                        </div>
-                    </div>
+            <div class="header">
+                <div v-if="active" class="indicator float-start bg-green-600 rounded-full w-10 h-10">
                 </div>
-                <div v-else>
-                    <h1>Нет билетов</h1>
+                <div v-else class="indicator float-start bg-red-600 rounded-full w-10 h-10">
                 </div>
-                <div class="buttons">
-                    <button @click="finish(currentTicket.id)" type="button" class="btn btn-primary">Завершить</button>
-                    <button @click="getNextTicket()" type="button" class="btn btn-primary">Следующий</button>
-                </div>
+                <button @click="startASession()" class="btn btn-primary float-end">Начать сессию</button>
+                <button @click="stopSession()" class="btn btn-primary float-right">Закончить сессию</button>
             </div>
+            <div class="info">
+                <div>
+                    <div v-if="currentTicket" class="info-container">
+                        <div class="number">
+                            {{ currentTicket.ticketNumber }}
+                        </div>
+                        <div class="rest">
+                            <div class="serviceName">
+                                {{ currentTicket.serviceName }}
+                            </div>
+                            <div class="register">
+                                {{ formatDate(currentTicket.registrationTime) }}
+                            </div>
+                            <div class="timer">
+                                <span v-if="countdown > 0">{{ formatTime(countdown) }}</span>
+                                <span class="text-red-500" v-else>15:00 + {{ formatTime(elapsedTime) }}</span>
+                            </div>
+                            <div class="status">
+                                {{ finished === true ? "Обслужен" : "Обслуживается" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <h1>Нет билетов</h1>
+                    </div>
+                    <div class="buttons">
+                        <button @click="finish(currentTicket.id)" type="button"
+                            class="btn btn-primary">Завершить</button>
+                        <button @click="getNextTicket()" type="button" class="btn btn-primary">Следующий</button>
+                    </div>
+                </div>
 
-
+            </div>
         </div>
         <div class="ticket-tab">
             <div class="title">
@@ -103,11 +177,14 @@ main {
         width: 70%;
         height: 100%;
         padding: 1rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+
 
         .info {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             text-align: center;
 
             .number {
