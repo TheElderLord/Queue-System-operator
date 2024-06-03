@@ -21,6 +21,7 @@ const finished = ref(false);
 
 const getSessionTickets = async () => {
     tickets.value = await fetchTickets();
+  
 }
 const getCurrentTicket = async () => {
     const result = await fetchCurrentTicket()
@@ -28,6 +29,7 @@ const getCurrentTicket = async () => {
     if (result.length === 0) {
         finished.value = true;
     }
+    else
     currentTicket.value = result[0];
 }
 const getNextTicket = async () => {
@@ -62,6 +64,7 @@ const formatTime = (time: number) => {
 };
 const stopSession = async () => {
     await stopSessionRequest();
+    active.value = false
     localStorage.setItem("sessionStatus", "OFFLINE")
 }
 
@@ -117,7 +120,7 @@ onMounted(() => {
             </div>
             <div class="info">
                 <div>
-                    <div v-if="currentTicket" class="info-container">
+                    <div v-if="currentTicket.id" class="info-container">
                         <div class="number">
                             {{ currentTicket.ticketNumber }}
                         </div>
@@ -128,7 +131,7 @@ onMounted(() => {
                             <div class="register">
                                 {{ formatDate(currentTicket.registrationTime) }}
                             </div>
-                            <div class="timer">
+                            <div class="timer font-bold">
                                 <span v-if="countdown > 0">{{ formatTime(countdown) }}</span>
                                 <span class="text-red-500" v-else>15:00 + {{ formatTime(elapsedTime) }}</span>
                             </div>
@@ -137,7 +140,7 @@ onMounted(() => {
                             </div>
                         </div>
                     </div>
-                    <div v-else>
+                    <div v-else class="p-4 text-2xl">
                         <h1>Нет билетов</h1>
                     </div>
                     <div class="buttons">
