@@ -3,6 +3,7 @@
 import { onMounted, ref, watch } from "vue";
 import type { Ticket } from "../models/ticket.interface"
 import { fetchTickets, fetchCurrentTicket, callNextTicket, ticketFinishPost, startSession, stopSessionRequest } from "../utils/tickets.utils"
+import { useRouter } from "vue-router";
 
 const active = ref(false);
 
@@ -17,6 +18,8 @@ const interval = ref(null as any);// Time elapsed after reaching 15 minutes
 
 
 const finished = ref(false);
+
+const router = useRouter();
 
 
 const getSessionTickets = async () => {
@@ -66,6 +69,11 @@ const stopSession = async () => {
     await stopSessionRequest();
     active.value = false
     localStorage.setItem("sessionStatus", "OFFLINE")
+    router.push("/")
+}
+
+const stopReasons=()=>{
+    
 }
 
 const startTimer = () => {
@@ -100,9 +108,9 @@ watch(active, () => {
 onMounted(() => {
     localStorage.getItem("sessionStatus") === "ONNLINE" ? active.value = true : active.value = false
 
-    // setInterval(() => {
-    //     getSessionTickets();
-    // }, 3000)
+    setInterval(() => {
+        getSessionTickets();
+    }, 3000)
 })
 
 
