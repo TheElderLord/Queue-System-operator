@@ -4,7 +4,6 @@ import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import type { Ticket } from "../models/ticket.interface"
 import { fetchTickets, fetchCurrentTicket, callNextTicket, ticketFinishPost, startSession, stopSessionRequest } from "../utils/tickets.utils"
-import { useRouter } from "vue-router";
 
 const router = useRouter();
 const active = ref(false);
@@ -23,7 +22,7 @@ const finished = ref(false);
 const endingSessionDialog = ref(false);
 const endingOption = ref("COMPLETED")
 
-const router = useRouter();
+
 
 
 const getSessionTickets = async () => {
