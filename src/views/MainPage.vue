@@ -1,10 +1,12 @@
 <script setup lang="ts">
 
 import { onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import type { Ticket } from "../models/ticket.interface"
 import { fetchTickets, fetchCurrentTicket, callNextTicket, ticketFinishPost, startSession, stopSessionRequest } from "../utils/tickets.utils"
 import { useRouter } from "vue-router";
 
+const router = useRouter();
 const active = ref(false);
 
 const tickets = ref([] as Ticket[]);
@@ -18,13 +20,15 @@ const interval = ref(null as any);// Time elapsed after reaching 15 minutes
 
 
 const finished = ref(false);
+const endingSessionDialog = ref(false);
+const endingOption = ref("COMPLETED")
 
 const router = useRouter();
 
 
 const getSessionTickets = async () => {
     tickets.value = await fetchTickets();
-  
+
 }
 const getCurrentTicket = async () => {
     const result = await fetchCurrentTicket()
@@ -33,7 +37,7 @@ const getCurrentTicket = async () => {
         finished.value = true;
     }
     else
-    currentTicket.value = result[0];
+        currentTicket.value = result[0];
 }
 const getNextTicket = async () => {
     if (!finished.value) {
@@ -66,15 +70,14 @@ const formatTime = (time: number) => {
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 const stopSession = async () => {
-    await stopSessionRequest();
+    // endingSessionDialog.value = true
+    await stopSessionRequest(endingOption.value);
     active.value = false
-    localStorage.setItem("sessionStatus", "OFFLINE")
+    localStorage.setItem("sessionStatus", endingOption.value)
     router.push("/")
 }
 
-const stopReasons=()=>{
-    
-}
+
 
 const startTimer = () => {
     interval.value = setInterval(() => {
@@ -124,7 +127,9 @@ onMounted(() => {
                 <div v-else class="indicator float-start bg-red-600 rounded-full w-10 h-10">
                 </div>
                 <button @click="startASession()" class="btn btn-primary float-end">Начать сессию</button>
-                <button @click="stopSession()" class="btn btn-primary float-right">Закончить сессию</button>
+                <button @click="endingSessionDialog = !endingSessionDialog"
+                    class="btn btn-primary float-right">Закончить
+                    сессию</button>
             </div>
             <div class="info">
                 <div>
@@ -172,6 +177,53 @@ onMounted(() => {
                 </div>
 
             </div>
+        </div>
+        <div class="modal">
+            <v-dialog v-model="endingSessionDialog" max-width="800">
+                <template v-slot:activator="{ props: activatorProps }">
+                    <v-btn v-bind="activatorProps" color="surface-variant" text="Создать" variant="flat"></v-btn>
+                </template>
+
+                <template v-slot:default>
+                    <v-card title="Закончить сессию">
+                        <v-card-text>
+                            <div class="card text-center">
+                                <ul class="list-group list-group-flush">
+                                    <v-col class="py-2" cols="20">
+                                        <p>Выберите вариант</p>
+
+                                        <v-btn-toggle v-model="endingOption" color="deep-purple-accent-3" rounded="0"
+                                            group>
+                                            <v-btn value="COMPLETED">
+                                                Окончание рабочего дня
+                                            </v-btn>
+
+                                            <v-btn value="BREAK">
+                                                Перерыв
+                                            </v-btn>
+
+                                            <v-btn value="FORCED">
+                                                Неполадки
+                                            </v-btn>
+
+                                            <!-- <v-btn value="justify">
+                                                Justify
+                                            </v-btn> -->
+                                        </v-btn-toggle>
+                                    </v-col>
+                                </ul>
+                            </div>
+
+                        </v-card-text>
+
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn @click="stopSession()" text="Закончить сессию"></v-btn>
+                            <v-btn text="Закрыть" @click="endingSessionDialog = !endingSessionDialog"></v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </template>
+            </v-dialog>
         </div>
 
     </main>

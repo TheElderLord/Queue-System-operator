@@ -70,10 +70,10 @@ export const startSession = async () => {
         console.log(error)
     }
 }
-export const stopSessionRequest = async () => {
+export const stopSessionRequest = async (option: string) => {
     try {
         const id = localStorage.getItem("sessionId")
-        const response: AxiosResponse = await axios.put(`${BASE_URL}/sessions/${id}`);
+        const response: AxiosResponse = await axios.put(`${BASE_URL}/sessions/${id}?status${option}`);
         // console.log("starting")
 
         return response.data;
