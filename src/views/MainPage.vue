@@ -46,12 +46,15 @@ const getNextTicket = async () => {
     await getSessionTickets();
     await getCurrentTicket();
     resetTimer();
+    startTimer();
     finished.value = false;
 }
 const finish = async (id: number) => {
     await ticketFinishPost(id);
     // currentTicket.value = null;
+
     finished.value = true;
+    resetTimer()
 }
 const startASession = async () => {
     active.value = true;
@@ -92,7 +95,7 @@ const resetTimer = () => {
     clearInterval(interval.value);
     countdown.value = 15 * 60 * 1000; // reset to 15 minutes
     elapsedTime.value = 0; // reset elapsed time
-    startTimer();
+    // startTimer();
 };
 
 

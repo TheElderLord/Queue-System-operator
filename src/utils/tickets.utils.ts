@@ -6,8 +6,8 @@ import type { Ticket } from "@/models/ticket.interface";
 export const fetchTickets = async (): Promise<Ticket[]> => {
     try {
         const response: AxiosResponse<Ticket[]> = await axios.post<Ticket[]>(TICKETS_URL, {
-            sessionId: 1,
-            branchId: 1,
+            operatorId: localStorage.getItem("opId"),
+            branchId: localStorage.getItem("branchId"),
             status: "NEW"
         });
         return response.data;
@@ -18,11 +18,13 @@ export const fetchTickets = async (): Promise<Ticket[]> => {
 }
 export const fetchCurrentTicket = async (): Promise<Ticket[]> => {
     try {
-        const response: AxiosResponse<Ticket[]> = await axios.post<Ticket[]>(TICKETS_URL, {
-            sessionId: 1,
-            branchId: 1,
+        const requestBody = {
+            operatorId: localStorage.getItem("opId"),
+            branchId: localStorage.getItem("branchId"),
             status: "INSERVICE"
-        });
+        }
+        console.log(requestBody);
+        const response: AxiosResponse<Ticket[]> = await axios.post<Ticket[]>(TICKETS_URL, requestBody);
         return response.data;
     } catch (error) {
         console.error("Error fetching tickets:", error);
@@ -32,8 +34,8 @@ export const fetchCurrentTicket = async (): Promise<Ticket[]> => {
 export const callNextTicket = async (): Promise<Ticket> => {
     try {
         const response: AxiosResponse<Ticket> = await axios.post<Ticket>(`${TICKET_CALL_NEXT_URL}`, {
-            sessionId: 1,
-            branchId: 1,
+            operatorId: localStorage.getItem("opId"),
+            branchId: localStorage.getItem("branchId"),
             status: null
         });
         return response.data;
@@ -73,7 +75,7 @@ export const startSession = async () => {
 export const stopSessionRequest = async (option: string) => {
     try {
         const id = localStorage.getItem("sessionId")
-        const response: AxiosResponse = await axios.put(`${BASE_URL}/sessions/${id}?status${option}`);
+        const response: AxiosResponse = await axios.put(`${BASE_URL}/sessions/${id}?status=${option}`);
         // console.log("starting")
 
         return response.data;
