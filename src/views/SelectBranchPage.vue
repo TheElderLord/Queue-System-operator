@@ -34,9 +34,9 @@ onMounted(() => {
 </script>
 <template>
     <main class="w-full h-full flex justify-center items-center">
-        <div class="container  ">
+        <div class="container  w-1/2">
 
-            <div class="title text-3xl text-center">
+            <div class="title text-3xl text-center m-4">
                 Выберите окно и отделение
             </div>
             <div class="branches">

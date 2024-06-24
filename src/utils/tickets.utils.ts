@@ -44,9 +44,9 @@ export const callNextTicket = async (): Promise<Ticket> => {
         throw error; // Re-throw the error to handle it elsewhere if needed
     }
 }
-export const ticketFinishPost = async (id: number): Promise<Ticket> => {
+export const ticketFinishPost = async (id: number,status:string): Promise<Ticket> => {
     try {
-        const response: AxiosResponse<Ticket> = await axios.put<Ticket>(`${TICKET_FINISH_URL}/${id}`);
+        const response: AxiosResponse<Ticket> = await axios.put<Ticket>(`${TICKET_FINISH_URL}/${id}?status=${status}`);
         return response.data;
     } catch (error) {
         console.error("Error fetching tickets:", error);
@@ -64,6 +64,7 @@ export const startSession = async () => {
             windowId: windowId,
             branchId: branchId
         });
+        if(response.data.id)
         localStorage.setItem("sessionId", response.data.id)
         // console.log("starting")
         return response.data;

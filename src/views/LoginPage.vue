@@ -16,10 +16,10 @@ const login = async () => {
 }
 </script>
 <template>
-    <div class=" container w-full h-full flex justify-center items-center ">
-        <div class="">
+    <div class="login-container w-full h-full flex justify-center items-center ">
+        <div class="wrapper w-1/2">
             <div class="title text-center text-3xl p-4">
-                <h1>Авторизация</h1>
+                <h1 class="font-bold">Авторизация</h1>
             </div>
             <div class="form text-center">
                 <form @submit.prevent="login()">
@@ -34,7 +34,7 @@ const login = async () => {
                             id="exampleInputPassword1">
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Подтвердить</button>
+                    <button type="submit" class="btn btn-primary text-white">Подтвердить</button>
                 </form>
             </div>
         </div>

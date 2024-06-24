@@ -49,8 +49,8 @@ const getNextTicket = async () => {
     startTimer();
     finished.value = false;
 }
-const finish = async (id: number) => {
-    await ticketFinishPost(id);
+const finish = async (id: number,status:string) => {
+    await ticketFinishPost(id,status);
     // currentTicket.value = null;
 
     finished.value = true;
@@ -126,8 +126,10 @@ onMounted(() => {
             <div class="header">
                 <div v-if="active" class="indicator float-start bg-green-600 rounded-full w-10 h-10">
                 </div>
+               
                 <div v-else class="indicator float-start bg-red-600 rounded-full w-10 h-10">
                 </div>
+                <!-- <div class="operatorFullN">{{}}</div> -->
                 <button @click="startASession()" class="btn btn-primary float-end">Начать сессию</button>
                 <button @click="endingSessionDialog = !endingSessionDialog"
                     class="btn btn-primary float-right">Закончить
@@ -150,25 +152,27 @@ onMounted(() => {
                                 <span v-if="countdown > 0">{{ formatTime(countdown) }}</span>
                                 <span class="text-red-500" v-else>15:00 + {{ formatTime(elapsedTime) }}</span>
                             </div>
-                            <div class="status">
+                            <div class="status text-xl">
                                 {{ finished === true ? "Обслужен" : "Обслуживается" }}
                             </div>
                         </div>
                     </div>
-                    <div v-else class="p-4 text-2xl">
+                    <div v-else class="p-4 text-4xl m-4">
                         <h1>Нет билетов</h1>
                     </div>
-                    <div class="buttons">
-                        <button @click="finish(currentTicket.id)" type="button"
-                            class="btn btn-primary">Завершить</button>
-                        <button @click="getNextTicket()" type="button" class="btn btn-primary">Следующий</button>
+                    <div class="buttons m-4">
+                        <button @click="finish(currentTicket.id,'MISSED')" type="button"
+                            class="btn btn-primary text-white">Не явился</button>
+                        <button @click="finish(currentTicket.id,'COMPLETED')" type="button"
+                            class="btn btn-primary text-white">Завершить</button>
+                        <button @click="getNextTicket()" type="button" class="btn btn-primary text-white">Следующий</button>
                     </div>
                 </div>
 
             </div>
         </div>
         <div class="ticket-tab">
-            <div class="title">
+            <div class="title text-3xl m-4 font-bold">
                 Список билетов
             </div>
             <div class="tickets">
@@ -253,7 +257,7 @@ main {
             text-align: center;
 
             .number {
-                font-size: 80px;
+                font-size: 100px;
 
             }
 
@@ -281,9 +285,10 @@ main {
 
             .ticket {
                 width: 100%;
-                box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+                box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+                border: 1px solid black;
                 padding: 0.5rem;
-                margin-bottom: 0.5rem;
+                margin-bottom: 1rem;
                 border-radius: .5rem;
                 display: flex;
                 font-size: 20px;
