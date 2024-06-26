@@ -2,6 +2,7 @@ import axios, { type AxiosResponse } from "axios";
 
 import { OPERATORS_URL } from "./base.utils";
 import type { OperatorAuth } from "@/models/operator/operatorAuth.interface";
+import type { Operator } from "@/models/operator/operator.interface";
 
 export const loginRequest = async (operator: OperatorAuth) => {
     try {

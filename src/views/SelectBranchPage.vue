@@ -14,6 +14,8 @@ const windows = ref([] as Window[]);
 const seletedBranchId = ref(0);
 const selectedWindowId = ref(0);
 
+const errorMessage = ref(false);
+
 const getBranches = async () => {
     branches.value = await fetchBranches();
     // console.log(branches.value)
@@ -23,6 +25,11 @@ const getWindows = async () => {
 }
 
 const sumbission = async () => {
+    if (seletedBranchId.value === 0 || selectedWindowId.value === 0) {
+        errorMessage.value = true;
+        return
+    }
+    errorMessage.value = false;
     localStorage.setItem("windowId", selectedWindowId.value + '');
     localStorage.setItem("branchId", seletedBranchId.value + '');
     router.push("/main")
@@ -68,8 +75,12 @@ onMounted(() => {
                 </div>
 
             </div>
+
             <div class="next text-center p-4">
                 <button @click="sumbission" class="btn btn-primary">Подтвердить</button>
+                <div v-if="errorMessage" class="error text-xl text-red-500">
+                    Выберите отделение и окно
+                </div>
             </div>
 
         </div>

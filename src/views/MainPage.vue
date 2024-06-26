@@ -3,7 +3,8 @@
 import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import type { Ticket } from "../models/ticket.interface"
-import { fetchTickets, fetchCurrentTicket, callNextTicket, ticketFinishPost, startSession, stopSessionRequest } from "../utils/tickets.utils"
+import { fetchTickets, fetchCurrentTicket, callNextTicket, ticketFinishPost, } from "../utils/tickets.utils"
+import { startSession, stopSessionRequest } from "../utils/sessions.utils"
 
 const router = useRouter();
 const active = ref(false);
@@ -49,8 +50,8 @@ const getNextTicket = async () => {
     startTimer();
     finished.value = false;
 }
-const finish = async (id: number,status:string) => {
-    await ticketFinishPost(id,status);
+const finish = async (id: number, status: string) => {
+    await ticketFinishPost(id, status);
     // currentTicket.value = null;
 
     finished.value = true;
@@ -126,7 +127,7 @@ onMounted(() => {
             <div class="header">
                 <div v-if="active" class="indicator float-start bg-green-600 rounded-full w-10 h-10">
                 </div>
-               
+
                 <div v-else class="indicator float-start bg-red-600 rounded-full w-10 h-10">
                 </div>
                 <!-- <div class="operatorFullN">{{}}</div> -->
@@ -161,11 +162,12 @@ onMounted(() => {
                         <h1>Нет билетов</h1>
                     </div>
                     <div class="buttons m-4">
-                        <button @click="finish(currentTicket.id,'MISSED')" type="button"
+                        <button @click="finish(currentTicket.id, 'MISSED')" type="button"
                             class="btn btn-primary text-white">Не явился</button>
-                        <button @click="finish(currentTicket.id,'COMPLETED')" type="button"
+                        <button @click="finish(currentTicket.id, 'COMPLETED')" type="button"
                             class="btn btn-primary text-white">Завершить</button>
-                        <button @click="getNextTicket()" type="button" class="btn btn-primary text-white">Следующий</button>
+                        <button @click="getNextTicket()" type="button"
+                            class="btn btn-primary text-white">Следующий</button>
                     </div>
                 </div>
 
