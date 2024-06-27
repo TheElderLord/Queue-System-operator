@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { loginRequest } from "../utils/operator.utils";
 import type { OperatorAuth } from "../models/operator/operatorAuth.interface";
+import { checkExistingActiveSessions } from "../utils/sessions.utils"
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
@@ -10,9 +11,21 @@ const router = useRouter();
 
 const login = async () => {
     const operator = await loginRequest(operatorObject.value);
-    localStorage.setItem("opId", operator.id);
+    localStorage.setItem("opId", operator.id + "");
     localStorage.setItem("authToken", "2ddawse");
-    router.push("/branch")
+    const exist = await checkExistingActiveSessions(operator.id);
+    console.log(exist);
+    if (exist.length === 0) {
+        return router.push("/branch")
+    }
+    else {
+        localStorage.setItem("windowId", exist[0].windowId + '');
+        localStorage.setItem("branchId", exist[0].branchId + '');
+        localStorage.setItem("sessionStatus", "ONNLINE")
+        return router.push("/main")
+    }
+
+
 }
 </script>
 <template>

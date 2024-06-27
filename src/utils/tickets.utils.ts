@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 
-import { TICKETS_URL, TICKET_CALL_NEXT_URL, TICKET_FINISH_URL, BASE_URL } from "./base.utils";
+import { TICKETS_URL, TICKET_CALL_NEXT_URL, TICKET_FINISH_URL } from "./base.utils";
 import type { Ticket } from "@/models/ticket.interface";
 
 export const fetchTickets = async (): Promise<Ticket[]> => {
@@ -44,7 +44,7 @@ export const callNextTicket = async (): Promise<Ticket> => {
         throw error; // Re-throw the error to handle it elsewhere if needed
     }
 }
-export const ticketFinishPost = async (id: number,status:string): Promise<Ticket> => {
+export const ticketFinishPost = async (id: number, status: string): Promise<Ticket> => {
     try {
         const response: AxiosResponse<Ticket> = await axios.put<Ticket>(`${TICKET_FINISH_URL}/${id}?status=${status}`);
         return response.data;
@@ -54,35 +54,5 @@ export const ticketFinishPost = async (id: number,status:string): Promise<Ticket
     }
 }
 
-export const startSession = async () => {
-    try {
-        const windowId = localStorage.getItem("windowId");
-        const branchId = localStorage.getItem("branchId");
-        const operatorId = localStorage.getItem("opId");
-        const response: AxiosResponse = await axios.post(`${BASE_URL}/sessions`, {
-            operatorId: operatorId,
-            windowId: windowId,
-            branchId: branchId
-        });
-        if(response.data.id)
-        localStorage.setItem("sessionId", response.data.id)
-        // console.log("starting")
-        return response.data;
 
-    } catch (error) {
-        console.log(error)
-    }
-}
-export const stopSessionRequest = async (option: string) => {
-    try {
-        const id = localStorage.getItem("sessionId")
-        const response: AxiosResponse = await axios.put(`${BASE_URL}/sessions/${id}?status=${option}`);
-        // console.log("starting")
-
-        return response.data;
-
-    } catch (error) {
-        console.log(error)
-    }
-}
 

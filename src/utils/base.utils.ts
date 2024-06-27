@@ -13,3 +13,4 @@ export const TICKET_FINISH_URL = `${BASE_URL}/tickets/end`
 export const OPERATORS_URL = `${BASE_URL}/operators`
 export const BRANCHES_URL = `${BASE_URL}/branches`
 export const WINDOWS_URL = `${BASE_URL}/windows`
+export const SESSIONS_URL = `${BASE_URL}/sessions`
