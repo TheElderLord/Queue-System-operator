@@ -1,7 +1,7 @@
 {
     "apps": [
       {
-        "name": "operator service front",
+        "name": "operator-front",
         "script": "index.js",
         "exec_mode": "fork",
         "instances": 1,
