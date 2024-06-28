@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginPage from '../views/LoginPage.vue';
 import MainPage from '../views/MainPage.vue';
 import SelectBranch from '../views/SelectBranchPage.vue';
+import RedirectTicket from '@/views/RedirectTicket.vue';
 
 const routes = [
   {
@@ -17,8 +18,14 @@ const routes = [
   },
   {
     path: '/branch',
-    name: 'branc',
+    name: 'branch',
     component: SelectBranch,
+    meta: { requiresAuth: true }, // This meta field indicates that the route requires authentication
+  },
+  {
+    path: '/redirect',
+    name: 'redirect',
+    component: RedirectTicket,
     meta: { requiresAuth: true }, // This meta field indicates that the route requires authentication
   },
 

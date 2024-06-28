@@ -5,10 +5,12 @@ import { useRouter } from "vue-router";
 import type { Ticket } from "../models/ticket.interface"
 import { fetchTickets, fetchCurrentTicket, callNextTicket, ticketFinishPost, } from "../utils/tickets.utils"
 import { startSession, stopSessionRequest } from "../utils/sessions.utils"
+import { useTicketStore } from "@/stores/counter";
 
 const router = useRouter();
-const active = ref(false);
+const store = useTicketStore();
 
+const active = ref(false);
 const tickets = ref([] as Ticket[]);
 const currentTicket = ref({} as Ticket);
 
@@ -38,6 +40,8 @@ const getCurrentTicket = async () => {
     }
     else
         currentTicket.value = result[0];
+
+    localStorage.setItem("ticketId",currentTicket.value.id+"")
 }
 const getNextTicket = async () => {
     if (!finished.value) {

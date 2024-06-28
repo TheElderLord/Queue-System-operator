@@ -54,5 +54,15 @@ export const ticketFinishPost = async (id: number, status: string): Promise<Tick
     }
 }
 
+export const fetchTicketById = async(id:number)=>{
+    try {
+        const response: AxiosResponse<Ticket> = await axios.get<Ticket>(`${TICKETS_URL}/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching tickets:", error);
+        throw error; // Re-throw the error to handle it elsewhere if needed
+    }
+}
+
 
 
