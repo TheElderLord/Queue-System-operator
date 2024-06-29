@@ -4,6 +4,8 @@ export interface Ticket {
     serviceId: number;
     serviceName: string;
     sessionId: number;
+    operatorId: number;
+    operatorName: string;
     windowNum: number;
     branchId: number;
     branchName: string;

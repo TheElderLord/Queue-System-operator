@@ -41,7 +41,7 @@ const getCurrentTicket = async () => {
     else
         currentTicket.value = result[0];
 
-    localStorage.setItem("ticketId",currentTicket.value.id+"")
+
 }
 const getNextTicket = async () => {
     if (!finished.value) {
@@ -82,6 +82,11 @@ const stopSession = async () => {
     active.value = false
     localStorage.setItem("sessionStatus", endingOption.value)
     router.push("/")
+}
+
+const redirect = (id: number) => {
+    localStorage.setItem("ticketId", id + "");
+    router.push("/redirect")
 }
 
 
@@ -166,9 +171,14 @@ onMounted(() => {
                         <h1>Нет билетов</h1>
                     </div>
                     <div class="buttons m-4">
-                        <button @click="finish(currentTicket.id, 'MISSED')" type="button"
+                        <button :disabled="!currentTicket || currentTicket.status !== 'INSERVICE'"
+                            @click="finish(currentTicket.id, 'MISSED')" type="button"
                             class="btn btn-primary text-white">Не явился</button>
-                        <button @click="finish(currentTicket.id, 'COMPLETED')" type="button"
+                        <button :disabled="!currentTicket || currentTicket.status !== 'INSERVICE'"
+                            @click="redirect(currentTicket.id)" type="button"
+                            class="btn btn-primary text-white">Перенаправить</button>
+                        <button :disabled="!currentTicket || currentTicket.status !== 'INSERVICE'"
+                            @click="finish(currentTicket.id, 'COMPLETED')" type="button"
                             class="btn btn-primary text-white">Завершить</button>
                         <button @click="getNextTicket()" type="button"
                             class="btn btn-primary text-white">Следующий</button>
