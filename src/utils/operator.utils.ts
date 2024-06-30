@@ -13,9 +13,18 @@ export const loginRequest = async (operator: OperatorAuth) => {
         throw error; // Re-throw the error to handle it elsewhere if needed
     }
 }
-export const fetchOperators = async () => {
+export const fetchOperators = async (): Promise<Operator[]> => {
     try {
-        const response = await axios.get(`${OPERATORS_URL}?active=true`);
+        const response: AxiosResponse<Operator[]> = await axios.get<Operator[]>(`${OPERATORS_URL}?active=true`);
+        return response.data;
+    } catch (error) {
+        console.error("Error login", error);
+        throw error; // Re-throw the error to handle it elsewhere if needed
+    }
+}
+export const fetchOperatorById = async (id: number): Promise<Operator> => {
+    try {
+        const response: AxiosResponse<Operator> = await axios.get<Operator>(`${OPERATORS_URL}/${id}`);
         return response.data;
     } catch (error) {
         console.error("Error login", error);

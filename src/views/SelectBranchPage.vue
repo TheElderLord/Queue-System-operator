@@ -34,6 +34,10 @@ const sumbission = async () => {
     localStorage.setItem("branchId", seletedBranchId.value + '');
     router.push("/main")
 }
+
+const goToLoginPage = () => {
+    router.push("/")
+}
 onMounted(() => {
     getBranches();
 })
@@ -41,16 +45,18 @@ onMounted(() => {
 </script>
 <template>
     <main class="w-full h-full flex justify-center items-center">
-        <div class="container  w-1/2">
+        <div class="container h-full  w-full">
+            <v-btn @click="goToLoginPage()" class="absolute"><i class="fa-solid fa-arrow-left"></i></v-btn>
 
             <div class="title text-3xl text-center m-4">
                 Выберите окно и отделение
             </div>
-            <div class="branches">
-                <div class="title text-xl">
+            <div class="branches w-1/2 mx-auto">
+                <div class="title text-xl m-2">
                     Выберите отделение
                 </div>
                 <div class="select">
+
                     <select required @change="getWindows()" v-model="seletedBranchId" class="form-select"
                         aria-label="Default select example">
                         <option value="0" selected>Отделение</option>
@@ -61,11 +67,12 @@ onMounted(() => {
                 </div>
 
             </div>
-            <div class="windows">
-                <div class="title text-xl">
+            <div class="windows w-1/2 mx-auto">
+                <div class="title text-xl m-2">
                     Выберите окна
                 </div>
                 <div class="select">
+
                     <select required v-model="selectedWindowId" class="form-select" aria-label="Default select example">
                         <option value="0" selected>Окно</option>
                         <option :value="window.id" v-for="window in windows" :key="window.id" class="branch">

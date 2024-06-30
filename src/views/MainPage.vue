@@ -6,6 +6,8 @@ import type { Ticket } from "../models/ticket.interface"
 import { fetchTickets, fetchCurrentTicket, callNextTicket, ticketFinishPost, } from "../utils/tickets.utils"
 import { startSession, stopSessionRequest } from "../utils/sessions.utils"
 import { useTicketStore } from "@/stores/counter";
+import type { Operator } from "@/models/operator/operator.interface";
+import { fetchOperatorById } from "../utils/operator.utils";
 
 const router = useRouter();
 const store = useTicketStore();
@@ -14,6 +16,7 @@ const active = ref(false);
 const tickets = ref([] as Ticket[]);
 const currentTicket = ref({} as Ticket);
 
+const operator = ref({} as Operator);
 // 15 minutes in milliseconds
 const countdown = ref(15 * 60 * 1000); // 15 minutes in milliseconds
 const elapsedTime = ref(0); // Time elapsed after reaching 15 minutes
@@ -89,6 +92,11 @@ const redirect = (id: number) => {
     router.push("/redirect")
 }
 
+const getOperatorInfo = async () => {
+    const operatorId: number = Number(localStorage.getItem("opId"));
+    operator.value = await fetchOperatorById(operatorId);
+
+}
 
 
 const startTimer = () => {
@@ -123,6 +131,7 @@ watch(active, () => {
 onMounted(() => {
     localStorage.getItem("sessionStatus") === "ONNLINE" ? active.value = true : active.value = false
 
+    getOperatorInfo();
     setInterval(() => {
         getSessionTickets();
     }, 3000)
@@ -139,14 +148,16 @@ onMounted(() => {
 
                 <div v-else class="indicator float-start bg-red-600 rounded-full w-10 h-10">
                 </div>
-                <!-- <div class="operatorFullN">{{}}</div> -->
+
                 <button @click="startASession()" class="btn btn-primary float-end">Начать сессию</button>
                 <button @click="endingSessionDialog = !endingSessionDialog"
                     class="btn btn-primary float-right">Закончить
                     сессию</button>
             </div>
+
             <div class="info">
                 <div>
+                    <div class="operatorFullN text-3xl font-bold">{{ operator.name + " " + operator.lastname }}</div>
                     <div v-if="currentTicket.id" class="info-container">
                         <div class="number">
                             {{ currentTicket.ticketNumber }}

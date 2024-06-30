@@ -36,15 +36,15 @@ const login = async () => {
             </div>
             <div class="form text-center">
                 <form @submit.prevent="login()">
-                    <div class="mb-3">
-                        <label for="exampleInputEmail1" class="form-label">Имя пользователя</label>
-                        <input v-model="operatorObject.username" type="text" class="form-control"
-                            id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <div class="form-floating mb-3">
+                        <input v-model="operatorObject.username" type="text" class="form-control" id="floatingInput"
+                            placeholder="name@example.com">
+                        <label for="floatingInput">Имя пользователя</label>
                     </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Пароль</label>
-                        <input v-model="operatorObject.password" type="password" class="form-control"
-                            id="exampleInputPassword1">
+                    <div class="form-floating mb-3">
+                        <input v-model="operatorObject.password" type="password" class="form-control" id="floatingInput"
+                            placeholder="name@example.com">
+                        <label for="floatingInput">Пароль</label>
                     </div>
 
                     <button type="submit" class="btn btn-primary text-white">Подтвердить</button>
