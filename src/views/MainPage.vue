@@ -149,8 +149,9 @@ onMounted(() => {
                 <div v-else class="indicator float-start bg-red-600 rounded-full w-10 h-10">
                 </div>
 
-                <button @click="startASession()" class="btn btn-primary float-end">Начать сессию</button>
-                <button @click="endingSessionDialog = !endingSessionDialog"
+                <button :disabled="active" @click="startASession()" class="btn btn-primary float-end">Начать
+                    сессию</button>
+                <button :disabled="!active" @click="endingSessionDialog = !endingSessionDialog"
                     class="btn btn-primary float-right">Закончить
                     сессию</button>
             </div>
