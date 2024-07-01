@@ -5,7 +5,7 @@ import type { Window } from "../models/window.interface";
 
 export const fetchWindowsById = async (id: number): Promise<Window[]> => {
     try {
-        const response: AxiosResponse<Window[]> = await axios.get<Window[]>(`${WINDOWS_URL}/branch/${id}`);
+        const response: AxiosResponse<Window[]> = await axios.get<Window[]>(`${WINDOWS_URL}/branch/${id}?active=false`);
         return response.data;
     } catch (error) {
         console.error("Error fetching Windows:", error);

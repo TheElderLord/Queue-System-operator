@@ -32,6 +32,7 @@ const redirect = async () => {
     }
     const requestObject = await redirectTicket(ticket.value.id, operator);
     alert("Вы успешно перенаправили билет")
+    goMainPage();
 }
 const goMainPage = () => {
     router.push("/main")
