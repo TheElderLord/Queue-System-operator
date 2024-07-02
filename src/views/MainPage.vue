@@ -63,12 +63,11 @@ const finish = async (id: number, status: string) => {
 
     finished.value = true;
     resetTimer()
+    setTimeout(() => {
+        getNextTicket()
+    }, 3000)
 }
-const startASession = async () => {
-    active.value = true;
-    localStorage.setItem("sessionStatus", "ONNLINE")
-    const data = await startSession();
-}
+
 
 const formatDate = (date: Date) => {
     return new Date(date).toLocaleString("ru-RU")
@@ -79,6 +78,12 @@ const formatTime = (time: number) => {
     const seconds = Math.floor((time % (1000 * 60)) / 1000);
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
+
+const startASession = async () => {
+    active.value = true;
+    localStorage.setItem("sessionStatus", "ONNLINE")
+    const data = await startSession();
+}
 const stopSession = async () => {
     // endingSessionDialog.value = true
     await stopSessionRequest(endingOption.value);
@@ -192,7 +197,7 @@ onMounted(() => {
                         <button :disabled="!currentTicket || currentTicket.status !== 'INSERVICE'"
                             @click="finish(currentTicket.id, 'COMPLETED')" type="button"
                             class="btn btn-primary text-white">Завершить</button>
-                        <button @click="getNextTicket()" type="button"
+                        <button :disabled="!finished" @click="getNextTicket()" type="button"
                             class="btn btn-primary text-white">Следующий</button>
                     </div>
                 </div>
