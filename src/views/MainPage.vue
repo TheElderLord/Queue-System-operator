@@ -2,7 +2,7 @@
 
 import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import type { Ticket } from "../models/ticket.interface"
+import type { Ticket } from "../models/ticket/ticket.interface"
 import { fetchTickets, fetchCurrentTicket, callNextTicket, ticketFinishPost, } from "../utils/tickets.utils"
 import { startSession, stopSessionRequest } from "../utils/sessions.utils"
 import { useTicketStore } from "@/stores/counter";
