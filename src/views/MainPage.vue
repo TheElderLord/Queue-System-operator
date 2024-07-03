@@ -272,11 +272,11 @@ onMounted(() => {
 main {
     display: flex;
     width: 100%;
-    height: 100vh;
+    height: 100%;
 
     .main-tab {
         background-color: rgb(222, 224, 222);
-        width: 70%;
+        width: 60%;
         height: 100%;
         padding: 1rem;
 
@@ -301,7 +301,7 @@ main {
     }
 
     .ticket-tab {
-        width: 30%;
+        width: 40%;
         height: 100%;
         background-color: rgb(239, 238, 238);
 
@@ -311,9 +311,11 @@ main {
 
         .tickets {
             width: 100%;
-            height: 100%;
+            height: 90%;
             display: flex;
             flex-direction: column;
+        
+            overflow: auto;
 
 
             .ticket {

@@ -14,6 +14,7 @@ import { RouterLink, RouterView } from 'vue-router'
 .body {
   width: 100%;
   height: 100vh;
+  overflow: hidden;
 }
 
 header {
