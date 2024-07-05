@@ -8,7 +8,7 @@ import type { TicketCall } from "@/models/ticket/ticket_call.interface";
 export const fetchTickets = async (): Promise<Ticket[]> => {
     try {
         const response: AxiosResponse<Ticket[]> = await axios.post<Ticket[]>(TICKETS_URL, {
-            
+            operatorId: localStorage.getItem("opId"),
             branchId: localStorage.getItem("branchId"),
             status: "NEW"
         });
@@ -34,14 +34,14 @@ export const fetchCurrentTicket = async (): Promise<Ticket[]> => {
     }
 }
 export const callNextTicket = async () => {
-    const nextTicket : TicketCall = {
+    const nextTicket: TicketCall = {
         operatorId: Number(localStorage.getItem("opId")),
         windowId: Number(localStorage.getItem("windowId")),
         branchId: Number(localStorage.getItem("branchId")),
         status: null
     }
     try {
-        const response  = await axios.post(`${TICKET_CALL_NEXT_URL}`, nextTicket);
+        const response = await axios.post(`${TICKET_CALL_NEXT_URL}`, nextTicket);
         return response.data;
     } catch (error) {
         console.error("Error fetching tickets:", error);

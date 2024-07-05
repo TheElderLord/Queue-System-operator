@@ -188,13 +188,11 @@ onMounted(() => {
                         <h1>Нет билетов</h1>
                     </div>
                     <div class="buttons m-4">
-                        <button :disabled="!currentTicket || currentTicket.status !== 'INSERVICE'"
-                            @click="finish(currentTicket.id, 'MISSED')" type="button"
+                        <button :disabled="!currentTicket" @click="finish(currentTicket.id, 'MISSED')" type="button"
                             class="btn btn-primary text-white">Не явился</button>
-                        <button :disabled="!currentTicket || currentTicket.status !== 'INSERVICE'"
-                            @click="redirect(currentTicket.id)" type="button"
+                        <button :disabled="!currentTicket" @click="redirect(currentTicket.id)" type="button"
                             class="btn btn-primary text-white">Перенаправить</button>
-                        <button :disabled="!currentTicket || currentTicket.status !== 'INSERVICE'"
+                        <button :disabled="!currentTicket || currentTicket.status === 'INSERVICE'"
                             @click="finish(currentTicket.id, 'COMPLETED')" type="button"
                             class="btn btn-primary text-white">Завершить</button>
                         <button :disabled="!finished" @click="getNextTicket()" type="button"
@@ -314,7 +312,7 @@ main {
             height: 90%;
             display: flex;
             flex-direction: column;
-        
+
             overflow: auto;
 
 
