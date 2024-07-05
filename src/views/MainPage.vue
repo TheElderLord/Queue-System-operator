@@ -128,20 +128,17 @@ const resetTimer = () => {
     // startTimer();
 };
 
-const formatService = (service: string) => {
+const formatService = (service:Ticket) => {
+
     console.log(service)
-    try {
-        const splitService = service.split(";");
-        let formatted;
-        splitService.map(e => {
-            if (e.includes(currentTicket.value.language))
-                formatted = e.replace(`${currentTicket.value.language}=`, "");
-        })
-        return formatted;
-    }catch(err){
-        return service;
-    }
-    
+    const splitService = service.serviceName.split(";");
+    let formatted;
+    splitService.map(e => {
+        if (e.includes(service.language))
+            formatted = e.replace(`${service.language}=`, "");
+    })
+    return formatted;
+
 }
 const servTicket = async(id:number)=>{
     if(currentTicket.value.operatorName)
@@ -209,7 +206,7 @@ onMounted(() => {
                         </div>
                         <div class="rest">
                             <div class="serviceName">
-                                {{ formatService(currentTicket.serviceName) }}
+                                {{ formatService(currentTicket) }}
                             </div>
                             <div class="register">
                                 {{ formatDate(currentTicket.registrationTime) }}
@@ -249,7 +246,7 @@ onMounted(() => {
             <div class="tickets">
                 <div v-for="ticket in tickets" :key="ticket.id" class="ticket">
                     <div class="ticketNum">{{ ticket.ticketNumber }}</div>
-                    <div class="serviceName">{{ formatService(ticket.serviceName) }}</div>
+                    <div class="serviceName">{{ formatService(ticket) }}</div>
                     <div class="times">{{ formatDate(ticket.registrationTime) }}</div>
                     <div class="times"><button @click="servTicket(ticket.id)" class="btn btn-primary">Обслужить</button></div>
 
