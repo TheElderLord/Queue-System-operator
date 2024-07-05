@@ -19,4 +19,6 @@ export interface Ticket {
     redirectedWindowId: number;
     agent: string;
     rating: number;
+    language:string,
+    
 }

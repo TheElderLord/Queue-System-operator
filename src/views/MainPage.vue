@@ -3,11 +3,12 @@
 import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import type { Ticket } from "../models/ticket/ticket.interface"
-import { fetchTickets, fetchCurrentTicket, callNextTicket, ticketFinishPost, } from "../utils/tickets.utils"
+import { fetchTickets, fetchOperatorCurrentTicket, callNextTicket, ticketFinishPost, fetchServTicketById, } from "../utils/tickets.utils"
 import { startSession, stopSessionRequest } from "../utils/sessions.utils"
 import { useTicketStore } from "@/stores/counter";
 import type { Operator } from "@/models/operator/operator.interface";
 import { fetchOperatorById } from "../utils/operator.utils";
+
 
 const router = useRouter();
 const store = useTicketStore();
@@ -15,6 +16,7 @@ const store = useTicketStore();
 const active = ref(false);
 const tickets = ref([] as Ticket[]);
 const currentTicket = ref({} as Ticket);
+const autoCall = ref(true);
 
 const operator = ref({} as Operator);
 // 15 minutes in milliseconds
@@ -36,7 +38,7 @@ const getSessionTickets = async () => {
 
 }
 const getCurrentTicket = async () => {
-    const result = await fetchCurrentTicket()
+    const result = await fetchOperatorCurrentTicket()
     console.log(result);
     if (result.length === 0) {
         finished.value = true;
@@ -62,10 +64,15 @@ const finish = async (id: number, status: string) => {
     // currentTicket.value = null;
 
     finished.value = true;
-    resetTimer()
-    setTimeout(() => {
-        getNextTicket()
-    }, 3000)
+    resetTimer();
+    if (autoCall.value) {
+        if (finished.value){
+        setTimeout(() => {
+            
+                getNextTicket()
+        }, 3000)
+    }
+    }
 }
 
 
@@ -121,6 +128,26 @@ const resetTimer = () => {
     // startTimer();
 };
 
+const formatService = (service: string) => {
+
+    console.log(service)
+    const splitService = service.split(";");
+    let formatted;
+    splitService.map(e => {
+        if (e.includes(currentTicket.value.language))
+            formatted = e.replace(`${currentTicket.value.language}=`, "");
+    })
+    return formatted;
+
+}
+const servTicket = async(id:number)=>{
+    if(currentTicket.value.operatorName)
+    await finish(currentTicket.value.id,"COMPLETED");
+    await fetchServTicketById(id);
+    await getCurrentTicket()
+}
+
+
 
 watch(active, () => {
     if (active.value) {
@@ -159,18 +186,27 @@ onMounted(() => {
                 <button :disabled="!active" @click="endingSessionDialog = !endingSessionDialog"
                     class="btn btn-primary float-right">Закончить
                     сессию</button>
+
+                <div class="absolute right-100 top-20">
+                    <v-switch v-model="autoCall" color="primary" label="Автопереключение" hide-details></v-switch>
+                </div>
+
+
             </div>
 
             <div class="info">
+
                 <div>
+
                     <div class="operatorFullN text-3xl font-bold">{{ operator.name + " " + operator.lastname }}</div>
                     <div v-if="currentTicket.id" class="info-container">
+
                         <div class="number">
                             {{ currentTicket.ticketNumber }}
                         </div>
                         <div class="rest">
                             <div class="serviceName">
-                                {{ currentTicket.serviceName }}
+                                {{ formatService(currentTicket.serviceName) }}
                             </div>
                             <div class="register">
                                 {{ formatDate(currentTicket.registrationTime) }}
@@ -182,6 +218,7 @@ onMounted(() => {
                             <div class="status text-xl">
                                 {{ finished === true ? "Обслужен" : "Обслуживается" }}
                             </div>
+
                         </div>
                     </div>
                     <div v-else class="p-4 text-4xl m-4">
@@ -192,7 +229,7 @@ onMounted(() => {
                             class="btn btn-primary text-white">Не явился</button>
                         <button :disabled="!currentTicket" @click="redirect(currentTicket.id)" type="button"
                             class="btn btn-primary text-white">Перенаправить</button>
-                        <button :disabled="!currentTicket || currentTicket.status === 'INSERVICE'"
+                        <button :disabled="!currentTicket || currentTicket.status !== 'INSERVICE'"
                             @click="finish(currentTicket.id, 'COMPLETED')" type="button"
                             class="btn btn-primary text-white">Завершить</button>
                         <button :disabled="!finished" @click="getNextTicket()" type="button"
@@ -209,8 +246,10 @@ onMounted(() => {
             <div class="tickets">
                 <div v-for="ticket in tickets" :key="ticket.id" class="ticket">
                     <div class="ticketNum">{{ ticket.ticketNumber }}</div>
-                    <div class="serviceName">{{ ticket.serviceName }}</div>
+                    <div class="serviceName">{{ formatService(ticket.serviceName) }}</div>
                     <div class="times">{{ formatDate(ticket.registrationTime) }}</div>
+                    <div class="times"><button @click="servTicket(ticket.id)" class="btn btn-primary">Обслужить</button></div>
+
                 </div>
 
             </div>
