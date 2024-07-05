@@ -129,16 +129,19 @@ const resetTimer = () => {
 };
 
 const formatService = (service: string) => {
-
     console.log(service)
-    const splitService = service.split(";");
-    let formatted;
-    splitService.map(e => {
-        if (e.includes(currentTicket.value.language))
-            formatted = e.replace(`${currentTicket.value.language}=`, "");
-    })
-    return formatted;
-
+    try {
+        const splitService = service.split(";");
+        let formatted;
+        splitService.map(e => {
+            if (e.includes(currentTicket.value.language))
+                formatted = e.replace(`${currentTicket.value.language}=`, "");
+        })
+        return formatted;
+    }catch(err){
+        return service;
+    }
+    
 }
 const servTicket = async(id:number)=>{
     if(currentTicket.value.operatorName)
