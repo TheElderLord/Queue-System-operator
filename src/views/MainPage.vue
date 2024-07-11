@@ -154,9 +154,9 @@ watch(active, () => {
         getCurrentTicket();
         getSessionTickets();
         startTimer()
-        setInterval(() => {
-            getSessionTickets();
-        }, 3000)
+        // setInterval(() => {
+        //     getSessionTickets();
+        // }, 3000)
     }
 });
 
@@ -166,7 +166,7 @@ onMounted(() => {
     getOperatorInfo();
     setInterval(() => {
         getSessionTickets();
-    }, 3000)
+    }, 5000)
 })
 
 
