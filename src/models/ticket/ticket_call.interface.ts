@@ -1,7 +1,7 @@
-export interface TicketCall{
- branchId:number
- operatorId:number
- windowId:number
-status:string
+export interface TicketCall {
+    branchId: number,
+    operatorId: number,
+    windowId: number,
+    status: string | null
 
 }

@@ -16,7 +16,7 @@ const store = useTicketStore();
 const active = ref(false);
 const tickets = ref([] as Ticket[]);
 const currentTicket = ref({} as Ticket);
-const autoCall = ref(true);
+const autoCall = ref(false);
 
 const operator = ref({} as Operator);
 // 15 minutes in milliseconds
@@ -66,12 +66,12 @@ const finish = async (id: number, status: string) => {
     finished.value = true;
     resetTimer();
     if (autoCall.value) {
-        if (finished.value){
-        setTimeout(() => {
-            
+        if (finished.value) {
+            setTimeout(() => {
+
                 getNextTicket()
-        }, 3000)
-    }
+            }, 3000)
+        }
     }
 }
 
@@ -128,7 +128,7 @@ const resetTimer = () => {
     // startTimer();
 };
 
-const formatService = (service:Ticket) => {
+const formatService = (service: Ticket) => {
 
     console.log(service)
     const splitService = service.serviceName.split(";");
@@ -140,9 +140,9 @@ const formatService = (service:Ticket) => {
     return formatted;
 
 }
-const servTicket = async(id:number)=>{
-    if(currentTicket.value.operatorName)
-    await finish(currentTicket.value.id,"COMPLETED");
+const servTicket = async (id: number) => {
+    if (currentTicket.value.operatorName)
+        await finish(currentTicket.value.id, "COMPLETED");
     await fetchServTicketById(id);
     await getCurrentTicket()
 }
@@ -248,7 +248,8 @@ onMounted(() => {
                     <div class="ticketNum">{{ ticket.ticketNumber }}</div>
                     <div class="serviceName">{{ formatService(ticket) }}</div>
                     <div class="times">{{ formatDate(ticket.registrationTime) }}</div>
-                    <div class="times"><button @click="servTicket(ticket.id)" class="btn btn-primary">Обслужить</button></div>
+                    <div class="times"><button @click="servTicket(ticket.id)" class="btn btn-primary">Обслужить</button>
+                    </div>
 
                 </div>
 
