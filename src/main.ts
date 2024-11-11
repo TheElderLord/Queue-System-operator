@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+// Edited by the nano code editor
 
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
