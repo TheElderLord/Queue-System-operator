@@ -37,6 +37,22 @@ const redirect = async () => {
 const goMainPage = () => {
     router.push("/main")
 }
+const formatService = (service: Ticket) => {
+    try {
+        console.log(service)
+        const splitService = service.serviceName.split(";");
+        let formatted;
+        splitService.map(e => {
+            if (e.includes(service.language))
+                formatted = e.replace(`${service.language}=`, "");
+        })
+        return formatted;
+    } catch (err) {
+        return service;
+    }
+
+
+}
 onMounted(() => {
     getTicketInfo();
     getOperators();
@@ -53,7 +69,7 @@ onMounted(() => {
             </div>
             <div class="ticketInfo">
                 <div class="ticketNumber text-5xl text-center m-4">Номер билета:{{ ticket.ticketNumber }}</div>
-                <div class="ticketNumber text-5xl text-center m-4">Услуга:{{ ticket.serviceName }}</div>
+                <div class="ticketNumber text-5xl text-center m-4">Услуга:{{ formatService(ticket.serviceName) }}</div>
                 <div class="ticketNumber text-5xl text-center m-4">Номер окна:{{ ticket.windowNum }}</div>
                 <div class="ticketNumber text-5xl text-center m-4">Оператор:{{ ticket.operatorName }}</div>
             </div>
