@@ -16,7 +16,9 @@ const login = async () => {
     const exist = await checkExistingActiveSessions(operator.id);
     console.log(exist);
     if (exist.length === 0) {
+        localStorage.setItem("sessionStatus", "OFFLINE")
         return router.push("/branch")
+
     }
     else {
         localStorage.setItem("windowId", exist[0].windowId + '');

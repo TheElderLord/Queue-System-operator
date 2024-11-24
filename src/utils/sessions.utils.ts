@@ -37,7 +37,8 @@ export const stopSessionRequest = async (option: string) => {
 export const checkExistingActiveSessions = async (operatorId: number) => {
     try {
         const response: AxiosResponse = await axios.get(`${SESSIONS_URL}/operator/${operatorId}?active=true`);
-        // console.log("starting")
+        console.log("starting")
+        console.log(response.data)
         return response.data;
 
     } catch (error) {
