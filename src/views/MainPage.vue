@@ -8,6 +8,8 @@ import { startSession, stopSessionRequest } from "../utils/sessions.utils"
 import { useTicketStore } from "@/stores/counter";
 import type { Operator } from "@/models/operator/operator.interface";
 import { fetchOperatorById } from "../utils/operator.utils";
+import type { Service } from "@/models/service.interface";
+import { fetchServiceById } from "@/utils/services.utils";
 
 
 const router = useRouter();
@@ -19,11 +21,16 @@ const currentTicket = ref({} as Ticket);
 const autoCall = ref(false);
 
 const operator = ref({} as Operator);
+const service = ref({} as Service)
 // 15 minutes in milliseconds
-const countdown = ref(15 * 60 * 1000); // 15 minutes in milliseconds
-const elapsedTime = ref(0); // Time elapsed after reaching 15 minutes
-const interval = ref(null as any);// Time elapsed after reaching 15 minutes
+const serviceCountdown = ref(0); // 15 minutes in milliseconds
+// 15 minutes in milliseconds
+const serviceElapsedTime = ref(0); // Time elapsed after reaching 15 minutes
+const serviceInterval = ref(null as any);// Time elapsed after reaching 15 minutes
 
+// const waitCountdown = ref(0);
+// const waitElapsedTime = ref(0); // Time elapsed after reaching 15 minutes
+// const waitInterval = ref(null as any);
 
 
 const finished = ref(false);
@@ -35,19 +42,69 @@ const endingOption = ref("COMPLETED")
 
 const getSessionTickets = async () => {
     tickets.value = await fetchTickets();
+    // tickets.value.map(async (e) => {
+    //     const startTime = e.registrationTime; // ISO string or timestamp
+    //     const startToDate = new Date(startTime); // Convert to a Date object
+    //     const nowDate = new Date(); // Current time
+    //     const service = await fetchServiceById(e.serviceId);
+    //     // Calculate the difference in milliseconds
+    //     const timeElapsed = nowDate.getTime() - startToDate.getTime();
+    //     if (service.maxWaitTime) {
+    //         const remainingTime = service.maxWaitTime - timeElapsed;
+
+    //         if (remainingTime > 0) {
+    //             waitCountdown.value = remainingTime; // Set the countdown to the remaining time
+    //             waitElapsedTime.value = 0; // Reset elapsed time
+    //         } else {
+    //             waitCountdown.value = 0; // No remaining time
+    //             waitElapsedTime.value = Math.abs(remainingTime); // Track how much time has elapsed beyond maxServTime
+    //         }
+    //     } else {
+    //         // Default to 15 minutes if maxServTime is not defined
+    //         waitCountdown.value = Math.max(0, 15 * 60 * 1000 - timeElapsed);
+    //         waitElapsedTime.value = Math.max(0, timeElapsed - 15 * 60 * 1000);
+    //     }
+    // })
 
 }
 const getCurrentTicket = async () => {
-    const result = await fetchOperatorCurrentTicket()
+    const result = await fetchOperatorCurrentTicket();
     console.log(result);
+
     if (result.length === 0) {
-        finished.value = true;
-    }
-    else
+        finished.value = true; // Mark the session as finished if no tickets are available
+    } else {
         currentTicket.value = result[0];
+        service.value = await fetchServiceById(currentTicket.value.serviceId);
 
+        const startTime = currentTicket.value.serviceStartTime; // ISO string or timestamp
+        const startToDate = new Date(startTime); // Convert to a Date object
+        const nowDate = new Date(); // Current time
 
-}
+        // Calculate the difference in milliseconds
+        const timeElapsed = nowDate.getTime() - startToDate.getTime();
+
+        console.log("Elapsed Time (ms):", timeElapsed);
+
+        // Check if service has a max time and calculate the remaining countdown
+        if (service.value.maxServTime) {
+            const remainingTime = service.value.maxServTime - timeElapsed;
+
+            if (remainingTime > 0) {
+                serviceCountdown.value = remainingTime; // Set the countdown to the remaining time
+                serviceElapsedTime.value = 0; // Reset elapsed time
+            } else {
+                serviceCountdown.value = 0; // No remaining time
+                serviceElapsedTime.value = Math.abs(remainingTime); // Track how much time has elapsed beyond maxServTime
+            }
+        } else {
+            // Default to 15 minutes if maxServTime is not defined
+            serviceCountdown.value = Math.max(0, 15 * 60 * 1000 - timeElapsed);
+            serviceElapsedTime.value = Math.max(0, timeElapsed - 15 * 60 * 1000);
+        }
+    }
+};
+
 const getNextTicket = async () => {
     if (!finished.value) {
         return alert("Обслуживание не окончено")
@@ -55,8 +112,8 @@ const getNextTicket = async () => {
     await callNextTicket();
     await getSessionTickets();
     await getCurrentTicket();
-    resetTimer();
-    startTimer();
+    resetServeTimer();
+    startServeTimer();
     finished.value = false;
 }
 const finish = async (id: number, status: string) => {
@@ -64,7 +121,7 @@ const finish = async (id: number, status: string) => {
     // currentTicket.value = null;
 
     finished.value = true;
-    resetTimer();
+    resetServeTimer();
     if (autoCall.value) {
         if (finished.value) {
             setTimeout(() => {
@@ -111,20 +168,36 @@ const getOperatorInfo = async () => {
 }
 
 
-const startTimer = () => {
-    interval.value = setInterval(() => {
-        if (countdown.value > 0) {
-            countdown.value -= 1000;
+const startWaitTimer = () => {
+    serviceInterval.value = setInterval(() => {
+        if (waitCountdown.value > 0) {
+            waitCountdown.value -= 1000;
         } else {
-            elapsedTime.value += 1000;
+            waitElapsedTime.value += 1000;
         }
     }, 1000);
 };
 
-const resetTimer = () => {
-    clearInterval(interval.value);
-    countdown.value = 15 * 60 * 1000; // reset to 15 minutes
-    elapsedTime.value = 0; // reset elapsed time
+const resetWaitTimer = () => {
+    clearInterval(serviceInterval.value);
+    waitCountdown.value = 15 * 60 * 1000; // reset to 15 minutes
+    waitElapsedTime.value = 0; // reset elapsed time
+    // startTimer();
+};
+const startServeTimer = () => {
+    serviceInterval.value = setInterval(() => {
+        if (serviceCountdown.value > 0) {
+            serviceCountdown.value -= 1000;
+        } else {
+            serviceElapsedTime.value += 1000;
+        }
+    }, 1000);
+};
+
+const resetServeTimer = () => {
+    clearInterval(serviceInterval.value);
+    serviceCountdown.value = 15 * 60 * 1000; // reset to 15 minutes
+    serviceElapsedTime.value = 0; // reset elapsed time
     // startTimer();
 };
 
@@ -153,7 +226,8 @@ watch(active, () => {
     if (active.value) {
         getCurrentTicket();
         getSessionTickets();
-        startTimer()
+        startServeTimer();
+        // startWaitTimer();
         // setInterval(() => {
         //     getSessionTickets();
         // }, 3000)
@@ -212,8 +286,13 @@ onMounted(() => {
                                 {{ formatDate(currentTicket.registrationTime) }}
                             </div>
                             <div class="timer font-bold">
-                                <span v-if="countdown > 0">{{ formatTime(countdown) }}</span>
-                                <span class="text-red-500" v-else>15:00 + {{ formatTime(elapsedTime) }}</span>
+                                <span v-if="serviceCountdown > 0">{{ formatTime(serviceCountdown) }}</span>
+                                <span class="text-red-500" v-else>{{ service.maxServTime ?
+                                    Math.round(service.maxServTime / 60000) :
+                                    '15:00' }} +
+                                    {{
+                                        formatTime(serviceElapsedTime)
+                                    }}</span>
                             </div>
                             <div class="status text-xl">
                                 {{ finished === true ? "Обслужен" : "Обслуживается" }}
