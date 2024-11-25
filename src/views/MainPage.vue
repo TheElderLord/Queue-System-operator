@@ -196,7 +196,7 @@ const startServeTimer = () => {
 
 const resetServeTimer = () => {
     clearInterval(serviceInterval.value);
-    serviceCountdown.value = 15 * 60 * 1000; // reset to 15 minutes
+    serviceCountdown.value = service.value.maxServTime; // reset to 15 minutes
     serviceElapsedTime.value = 0; // reset elapsed time
     // startTimer();
 };
